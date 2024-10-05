@@ -1,0 +1,132 @@
+#include <iostream>
+#include <cstdlib>
+#include <ctime>
+#include <cstdint>
+#include <random>
+#include <cmath>
+#include <string>
+#include <sstream>
+
+using namespace std;
+
+// Node class to hold 64-bit segments of the large number
+struct Node {
+    uint64_t value;  // each node holds a 64-bit number
+    Node* next;
+    Node(uint64_t val) : value(val), next(nullptr) {}
+};
+
+// Linked list class to store the entire 1024-bit number
+class BigNumber {
+public:
+    Node* head;
+
+    BigNumber() : head(nullptr) {}
+
+    // Function to insert 64-bit chunks into the linked list
+    void insert(uint64_t value) {
+        Node* newNode = new Node(value);
+        if (head == nullptr) {
+            head = newNode;
+        }
+        else {
+            Node* temp = head;
+            while (temp->next != nullptr) {
+                temp = temp->next;
+            }
+            temp->next = newNode;
+        }
+    }
+
+    // Function to convert the number stored in linked list to string
+    string toString() const {
+        stringstream ss;
+        Node* temp = head;
+        while (temp != nullptr) {
+            ss << temp->value;
+            temp = temp->next;
+        }
+        return ss.str();
+    }
+
+    // Get the remainder when dividing the large number by a smaller prime
+    uint64_t getModulus(uint64_t prime) const {
+        uint64_t remainder = 0;
+        Node* temp = head;
+        while (temp != nullptr) {
+            remainder = (remainder * ((uint64_t)pow(10, 19)) + temp->value) % prime;
+            temp = temp->next;
+        }
+        return remainder;
+    }
+};
+
+// Generate a 1024-bit random number and store in a linked list
+BigNumber generate1024BitNumber() {
+    BigNumber bigNum;
+
+    random_device rd;
+    mt19937_64 gen(rd()); // Mersenne Twister engine for random 64-bit integers
+    uniform_int_distribution<uint64_t> dis(0, UINT64_MAX); // Random 64-bit generator
+
+    // Insert 16 nodes (each holding 64 bits) to form the 1024-bit number
+    for (int i = 0; i < 16; ++i) {
+        bigNum.insert(dis(gen));
+    }
+
+    return bigNum;
+}
+
+// List of small primes for quick elimination
+int smallPrimes[] = { 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97 };
+int numSmallPrimes = sizeof(smallPrimes) / sizeof(smallPrimes[0]);
+
+// Check divisibility by smaller primes
+bool divisibleBySmallPrimes(const BigNumber& bigNum) {
+    for (int i = 0; i < numSmallPrimes; ++i) {
+        if (bigNum.getModulus(smallPrimes[i]) == 0) {
+            return true; // Not prime if divisible by any small prime
+        }
+    }
+    return false;
+}
+
+// Basic primality test for large numbers
+bool isPrime(const BigNumber& bigNum) {
+    // Eliminate based on smaller primes
+    if (divisibleBySmallPrimes(bigNum)) {
+        return false;
+    }
+
+    // If it passes the small prime checks, return true (for simplicity)
+    // You could replace this with Miller-Rabin or another robust test for large numbers
+    return true;
+}
+
+int main() {
+    srand(time(0));  // Seed random generator
+
+    // Generate a 1024-bit number
+    BigNumber bigNum = generate1024BitNumber();
+
+    // Print the generated number as a string
+    cout << "Generated 1024-bit number: " << bigNum.toString() << endl;
+
+    // Print small primes used for checking
+    cout << "Small primes: [";
+    for (int i = 0; i < numSmallPrimes; ++i) {
+        cout << smallPrimes[i];
+        if (i != numSmallPrimes - 1) {
+            cout << ", ";
+        }
+    }
+    cout << "]" << endl;
+
+    // Perform primality test
+    bool result = isPrime(bigNum);
+
+    // Output the result
+    cout << "Output: " << (result ? "True (Prime)" : "False (Not Prime)") << endl;
+
+    return 0;
+}

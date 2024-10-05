@@ -1,1 +1,23 @@
+Problem 2: Very large Prime Number Calculation
+When it comes to storing very large numbers, one possible way is to use a linked list. For example, if you want to store a 1024-bit random number, you can store 32-bit integers in each node of the lined list. The linked list as a whole, then contains the 1024-bit number. Or you can take the digits of the big number, which can be fitted inside each node, and using a linked list can represent the number (e.g. to represent 1234567890123456789, you may keep 12345 in node1, 67890 in node 2 and so on so forth). This was the easy part. You are required to evaluate and determine, probabilistically or deterministically, whether a 1024-bit random number is prime or not. Since primitive data types cannot store a 1024-bit number, the number will be split across multiple linked list nodes. You can use any methodology to split the number and store it in the linked list, however pay special attention to memory usage and primality test.
+Task
+•	Store a 1024-bit (309 digits) random number in a linked list.
+•	Each node of the linked list can contain up to 64 bit numbers.
+•	Implement any method to check for primality of this number.
+•	Make sure your chosen method, operates across multiple nodes in the linked list (No partial primality tests).
+Approach:
+•	Node Class: The Node structure holds a 64-bit segment of the large number. Each node is linked to the next, forming a linked list representation of the 1024-bit number.
+•	BigNumber Class: The BigNumber class stores the entire 1024-bit number as a linked list of Node objects, each holding 64 bits of the number. It provides methods to: Insert new 64-bit segments.Convert the large number into a string for display.Perform a modular operation (getModulus) to check divisibility by smaller prime numbers.
+•	1024-bit Number Generation: The generate1024BitNumber() function generates a random 1024-bit number by producing 16 random 64-bit segments. These segments are inserted into the BigNumber linked list.
+•	 Primality Test: The function isPrime() tests whether the large number is divisible by any of the smaller primes. The small primes are stored in an array, and the large number is divided by each prime using modular arithmetic.
+Assumption:
+• We code assumes that the number generated is uniformly random.
+• Only basic primality testing is done by checking small primes
+• Modular arithmetic is used to handle the large size of the 1024-bit number by breaking it down into manageable 64-bit chunks.
+Challenges Faced: 
+• Memory Management: Handling very large numbers in memory using a linked list addsed complexity, as the program needs to manage the nodes efficiently.
+• Modular Arithmetic: Computing the modulus of a very large number (1024 bits) by a small prime required careful handling to avoid overflow and ensure correct results.
+
+ 
+
 
